@@ -54,41 +54,38 @@ namespace Onllama.MyRegistry
                                     async context =>
                                     {
                                         foreach (var itemHeader in context.Request.Headers)
-                                        {
                                             Console.WriteLine(itemHeader.Key + ":" + itemHeader.Value);
-                                        }
+
                                         var hash = context.Request.RouteValues["hash"].ToString().Replace(':', '-');
                                         var path = Path.Combine(modelpath, "blobs", hash);
                                         if (File.Exists(path))
                                         {
-                                            var fileInfo = new FileInfo(path);
-                                            var fileLength = fileInfo.Length;
+                                            var fileLength = new FileInfo(path).Length;
 
-                                            // 处理Range请求
-                                            //if (context.Request.Headers.ContainsKey("Range"))
-                                            //{
-                                            //    var rangeHeader = context.Request.Headers["Range"].ToString();
-                                            //    var range = rangeHeader.Replace("bytes=", "").Split('-');
-                                            //    var start = long.Parse(range[0]);
-                                            //    var end = range.Length > 1 ? long.Parse(range[1]) : fileLength - 1;
+                                            //处理Range请求
+                                            if (context.Request.Headers.ContainsKey("Range"))
+                                            {
+                                                var rangeHeader = context.Request.Headers["Range"].ToString();
+                                                var range = rangeHeader.Replace("bytes=", "").Split('-');
+                                                var start = long.Parse(range[0]);
+                                                var end = range.Length > 1 ? long.Parse(range[1]) : fileLength - 1;
+                                                var length = end - start + 1;
 
-                                            //    if (start >= fileLength || end >= fileLength)
-                                            //    {
-                                            //        context.Response.StatusCode = StatusCodes.Status416RequestedRangeNotSatisfiable;
-                                            //        return;
-                                            //    }
+                                                if (start >= fileLength || end >= fileLength)
+                                                {
+                                                    context.Response.StatusCode = StatusCodes.Status416RequestedRangeNotSatisfiable;
+                                                    return;
+                                                }
 
-                                            //    context.Response.Headers.Location = context.Request.Path.ToString();
-                                            //    context.Response.StatusCode = StatusCodes.Status206PartialContent;
-                                            //    context.Response.ContentType = "application/octet-stream";
-                                            //    context.Response.Headers.Add("Content-Range", $"bytes {start}-{end}/{fileLength}");
-                                            //    context.Response.ContentLength = end - start + 1;
+                                                context.Response.Headers.Location = context.Request.Path.ToString();
+                                                context.Response.StatusCode = StatusCodes.Status206PartialContent;
+                                                context.Response.ContentType = "application/octet-stream";
+                                                context.Response.Headers.Add("Content-Range", $"bytes {start}-{end}/{fileLength}");
+                                                context.Response.ContentLength = length;
 
-                                            //    using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                                            //    fileStream.Seek(start, SeekOrigin.Begin);
-                                            //    await fileStream.CopyToAsync(context.Response.Body);
-                                            //}
-                                            //else
+                                                await context.Response.SendFileAsync(path,start, length);
+                                            }
+                                            else
                                             {
                                                 context.Response.Headers.Location = context.Request.Path.ToString();
                                                 context.Response.ContentLength = fileLength;
@@ -96,8 +93,7 @@ namespace Onllama.MyRegistry
                                                 context.Response.ContentType = "application/octet-stream";
                                                 context.Response.Headers.Add("Content-Disposition", $"attachment; filename={hash}");
 
-                                                await using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                                                await fileStream.CopyToAsync(context.Response.Body);
+                                                await context.Response.SendFileAsync(path);
                                             }
                                         }
                                         else
