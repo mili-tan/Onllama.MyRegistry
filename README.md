@@ -15,3 +15,9 @@ dotnet run -c Release
 ollama pull <Server>/library/qwen2.5 --insecure
 ollama cp <Server>/library/qwen2.5 library/qwen2.5
 ```
+## TODO
+- [ ] CLI
+- [ ] HTTPS
+- [ ] Ollama Push
+- [ ] Identity / Ollama Keys
+- [ ] Fallback to reverse proxy
