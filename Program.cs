@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Onllama.MyRegistry
 {
@@ -12,7 +13,10 @@ namespace Onllama.MyRegistry
         {
             var modelPath = Environment.GetEnvironmentVariable("OLLAMA_MODELS") ??
                             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ollama",
-                                "models");
+            "models");
+
+            if (Directory.Exists("/usr/share/ollama/.ollama")) modelPath = "/usr/share/ollama/.ollama";
+
             Console.WriteLine("ModelPath:" + modelPath);
 
             try
