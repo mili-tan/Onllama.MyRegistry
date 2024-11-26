@@ -16,8 +16,8 @@ namespace Onllama.MyRegistry
                             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ollama",
             "models");
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Directory.Exists("/usr/share/ollama/.ollama"))
-                modelPath = "/usr/share/ollama/.ollama";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Directory.Exists("/usr/share/ollama/.ollama/models"))
+                modelPath = "/usr/share/ollama/.ollama/models";
 
             Console.WriteLine("ModelPath:" + modelPath);
 
