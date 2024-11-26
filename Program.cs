@@ -10,8 +10,10 @@ namespace Onllama.MyRegistry
     {
         static void Main(string[] args)
         {
-            var modelpath = Environment.GetEnvironmentVariable("OLLAMA_MODELS");
-            Console.WriteLine(modelpath);
+            var modelPath = Environment.GetEnvironmentVariable("OLLAMA_MODELS") ??
+                            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ollama",
+                                "models");
+            Console.WriteLine("ModelPath:" + modelPath);
 
             try
             {
@@ -57,7 +59,7 @@ namespace Onllama.MyRegistry
                                             Console.WriteLine(itemHeader.Key + ":" + itemHeader.Value);
 
                                         var hash = context.Request.RouteValues["hash"].ToString().Replace(':', '-');
-                                        var path = Path.Combine(modelpath, "blobs", hash);
+                                        var path = Path.Combine(modelPath, "blobs", hash);
                                         if (File.Exists(path))
                                         {
                                             var fileLength = new FileInfo(path).Length;
@@ -107,7 +109,7 @@ namespace Onllama.MyRegistry
                                         var rope = context.Request.RouteValues["rope"].ToString();
                                         var model = context.Request.RouteValues["model"].ToString();
                                         var tag = context.Request.RouteValues["tag"].ToString();
-                                        var path = Path.Combine(modelpath, "manifests\\registry.ollama.ai", rope, model, tag);
+                                        var path = Path.Combine(modelPath, "manifests\\registry.ollama.ai", rope, model, tag);
                                         Console.WriteLine(path);
                                         if (File.Exists(path))
                                             await context.Response.SendFileAsync(path);
