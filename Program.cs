@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Onllama.MyRegistry
 {
@@ -15,7 +16,8 @@ namespace Onllama.MyRegistry
                             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ollama",
             "models");
 
-            if (Directory.Exists("/usr/share/ollama/.ollama")) modelPath = "/usr/share/ollama/.ollama";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Directory.Exists("/usr/share/ollama/.ollama"))
+                modelPath = "/usr/share/ollama/.ollama";
 
             Console.WriteLine("ModelPath:" + modelPath);
 
