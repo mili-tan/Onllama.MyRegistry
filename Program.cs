@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Onllama.MyRegistry
@@ -115,7 +114,8 @@ namespace Onllama.MyRegistry
                                         var rope = context.Request.RouteValues["rope"].ToString();
                                         var model = context.Request.RouteValues["model"].ToString();
                                         var tag = context.Request.RouteValues["tag"].ToString();
-                                        var path = Path.Combine(modelPath, "manifests\\registry.ollama.ai", rope, model, tag);
+                                        var path = Path.Combine(modelPath, "manifests", "registry.ollama.ai", rope,
+                                            model, tag);
                                         Console.WriteLine(path);
                                         if (File.Exists(path))
                                             await context.Response.SendFileAsync(path);
