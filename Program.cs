@@ -138,13 +138,16 @@ namespace Onllama.MyRegistry
                                             var model = context.Request.RouteValues["model"].ToString();
                                             var tag = context.Request.RouteValues["tag"].ToString();
 
-                                            var path = Path.Combine(modelPath, "manifests", "registry.ollama.ai", rope,
-                                                model, tag);
-                                            Console.WriteLine(path);
-                                            if (File.Exists(path))
+                                            foreach (var path in Directory
+                                                         .GetDirectories(Path.Combine(modelPath, "manifests")).ToList()
+                                                         .Select(subs => Path.Combine(subs, rope, model, tag)))
+                                            {
+                                                if (!File.Exists(path)) continue;
+                                                Console.WriteLine(path);
                                                 await context.Response.SendFileAsync(path);
-                                            else
-                                                context.Response.StatusCode = 404;
+                                            }
+
+                                            context.Response.StatusCode = 404;
                                         });
                                 });
                             });
