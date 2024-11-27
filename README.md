@@ -26,9 +26,9 @@ Copyright (c) 2024 Milkey Tan. Code released under the MIT License
 Usage: Onllama.MyRegistry [options]
 
 Options:
-  -?|-he|--help             Show help information.
-  -l|--listen <IPEndPoint>  监听的地址与端口。
-  -m|--model <path>         模型文件路径。
+  -?|-he|--help             Show help information / 查看帮助信息。
+  -l|--listen <IPEndPoint>  Set server listening address and port / 监听的地址与端口。
+  -m|--model <path>         Set model path / 模型文件路径。
 ```
 ## TODO
 - [x] CLI

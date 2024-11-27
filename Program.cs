@@ -27,7 +27,7 @@ namespace Onllama.MyRegistry
                 isZh ? "监听的地址与端口。" : "Set server listening address and port",
                 CommandOptionType.SingleValue);
             var modelPathOption = cmd.Option<string>("-m|--model <path>",
-                isZh ? "模型文件路径。" : "Set model file path",
+                isZh ? "模型文件路径。" : "Set model path",
                 CommandOptionType.SingleValue);
             var listen = new IPEndPoint(IPAddress.Any, 80);
             var modelPath = Environment.GetEnvironmentVariable("OLLAMA_MODELS") ??
