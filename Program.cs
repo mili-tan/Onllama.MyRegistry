@@ -142,6 +142,7 @@ namespace Onllama.MyRegistry
                                                 if (!File.Exists(path)) continue;
                                                 Console.WriteLine("Manifests:" + path);
                                                 await context.Response.SendFileAsync(path);
+                                                return;
                                             }
 
                                             context.Response.StatusCode = 404;
