@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 using McMaster.Extensions.CommandLineUtils;
+using System.Linq;
 
 namespace Onllama.MyRegistry
 {
@@ -61,11 +62,6 @@ namespace Onllama.MyRegistry
 
                         .Configure(app =>
                         {
-                            app.Use(async (context, next) =>
-                            {
-                                Console.WriteLine(context.Request.Path);
-                                await next.Invoke();
-                            });
                             app.Map("/v2", svr =>
                             {
                                 app.UseRouting().UseEndpoints(endpoint =>
@@ -80,16 +76,18 @@ namespace Onllama.MyRegistry
                                         "/v2/{rope}/{model}/blobs/{hash}",
                                         async context =>
                                         {
-                                            foreach (var itemHeader in context.Request.Headers)
-                                                Console.WriteLine(itemHeader.Key + ":" + itemHeader.Value);
+                                            Console.WriteLine(context.Connection.RemoteIpAddress + "|" + string.Join(
+                                                ' ', context.Request.Headers.Select(x => x.Key + ":" + x.Value)));
 
                                             var hash = context.Request.RouteValues["hash"].ToString().Replace(':', '-');
                                             var path = Path.Combine(modelPath, "blobs", hash);
+
                                             if (File.Exists(path))
                                             {
                                                 var fileLength = new FileInfo(path).Length;
+                                                context.Response.Headers.Location = context.Request.Path.ToString();
+                                                context.Response.ContentType = "application/octet-stream";
 
-                                                //处理Range请求
                                                 if (context.Request.Headers.ContainsKey("Range"))
                                                 {
                                                     var rangeHeader = context.Request.Headers["Range"].ToString();
@@ -105,21 +103,17 @@ namespace Onllama.MyRegistry
                                                         return;
                                                     }
 
-                                                    context.Response.Headers.Location = context.Request.Path.ToString();
+                                                    context.Response.ContentLength = length;
                                                     context.Response.StatusCode = StatusCodes.Status206PartialContent;
-                                                    context.Response.ContentType = "application/octet-stream";
                                                     context.Response.Headers.Add("Content-Range",
                                                         $"bytes {start}-{end}/{fileLength}");
-                                                    context.Response.ContentLength = length;
 
                                                     await context.Response.SendFileAsync(path, start, length);
                                                 }
                                                 else
                                                 {
-                                                    context.Response.Headers.Location = context.Request.Path.ToString();
                                                     context.Response.ContentLength = fileLength;
                                                     context.Response.StatusCode = StatusCodes.Status200OK;
-                                                    context.Response.ContentType = "application/octet-stream";
                                                     context.Response.Headers.Add("Content-Disposition",
                                                         $"attachment; filename={hash}");
 
