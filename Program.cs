@@ -76,7 +76,7 @@ namespace Onllama.MyRegistry
                                         "/v2/{rope}/{model}/blobs/{hash}",
                                         async context =>
                                         {
-                                            Console.WriteLine(context.Connection.RemoteIpAddress + "|" + string.Join(
+                                            Console.WriteLine("Blobs:" + context.Connection.RemoteIpAddress + "|" + string.Join(
                                                 ' ', context.Request.Headers.Select(x => x.Key + ":" + x.Value)));
 
                                             var hash = context.Request.RouteValues["hash"].ToString().Replace(':', '-');
@@ -128,6 +128,9 @@ namespace Onllama.MyRegistry
                                         "/v2/{rope}/{model}/manifests/{tag}",
                                         async context =>
                                         {
+                                            Console.WriteLine("Manifests:" + context.Connection.RemoteIpAddress + "|" + string.Join(
+                                                ' ', context.Request.Headers.Select(x => x.Key + ":" + x.Value)));
+
                                             var rope = context.Request.RouteValues["rope"].ToString();
                                             var model = context.Request.RouteValues["model"].ToString();
                                             var tag = context.Request.RouteValues["tag"].ToString();
@@ -137,7 +140,7 @@ namespace Onllama.MyRegistry
                                                          .Select(subs => Path.Combine(subs, rope, model, tag)))
                                             {
                                                 if (!File.Exists(path)) continue;
-                                                Console.WriteLine(path);
+                                                Console.WriteLine("Manifests:" + path);
                                                 await context.Response.SendFileAsync(path);
                                             }
 
