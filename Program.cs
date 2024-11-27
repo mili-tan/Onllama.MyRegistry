@@ -21,7 +21,7 @@ namespace Onllama.MyRegistry
                               Environment.NewLine +
                               $"Copyright (c) {DateTime.Now.Year} Milkey Tan. Code released under the MIT License"
             };
-            cmd.HelpOption("-?|-h|--help");
+            cmd.HelpOption("-?|-h|--help|-he");
 
             var ipOption = cmd.Option<string>("-l|--listen <IPEndPoint>",
                 isZh ? "监听的地址与端口。" : "Set server listening address and port",
@@ -137,6 +137,7 @@ namespace Onllama.MyRegistry
                                             var rope = context.Request.RouteValues["rope"].ToString();
                                             var model = context.Request.RouteValues["model"].ToString();
                                             var tag = context.Request.RouteValues["tag"].ToString();
+
                                             var path = Path.Combine(modelPath, "manifests", "registry.ollama.ai", rope,
                                                 model, tag);
                                             Console.WriteLine(path);

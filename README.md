@@ -4,6 +4,9 @@
 > 请确保已经 [安装 .NET SDK](https://learn.microsoft.com/zh-cn/dotnet/core/install/linux) 运行环境
 - Server / 服务端
 ```
+#for Windows
+#net stop http
+
 ollama pull library/qwen2.5
 
 git clone https://github.com/mili-tan/Onllama.MyRegistry
@@ -15,8 +18,20 @@ dotnet run -c Release
 ollama pull <Server>/library/qwen2.5 --insecure
 ollama cp <Server>/library/qwen2.5 library/qwen2.5
 ```
+- Usage / 使用
+```
+Onllama.MyRegistry - Running your own Ollama Registry locally.
+Copyright (c) 2024 Milkey Tan. Code released under the MIT License
+
+Usage: Onllama.MyRegistry [options]
+
+Options:
+  -?|-he|--help             Show help information.
+  -l|--listen <IPEndPoint>  监听的地址与端口。
+  -m|--model <path>         模型文件路径。
+```
 ## TODO
-- [ ] CLI
+- [x] CLI
 - [ ] HTTPS
 - [ ] Ollama Push
 - [ ] Identity / Ollama Keys
