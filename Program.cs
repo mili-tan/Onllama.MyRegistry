@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Onllama.MyRegistry
 {
@@ -30,6 +31,14 @@ namespace Onllama.MyRegistry
             var modelPathOption = cmd.Option<string>("-m|--model <path>",
                 isZh ? "模型文件路径。" : "Set model path",
                 CommandOptionType.SingleValue);
+            var httpsOption = cmd.Option("-s|--https", isZh ? "启用 HTTPS。" : "Set enable HTTPS",
+                CommandOptionType.NoValue);
+            var pemOption = cmd.Option<string>("-pem|--pemfile <FilePath>",
+                isZh ? "PEM 证书路径。 <./cert.pem>" : "Set your pem certificate file path <./cert.pem>",
+                CommandOptionType.SingleOrNoValue);
+            var keyOption = cmd.Option<string>("-key|--keyfile <FilePath>",
+                isZh ? "PEM 证书密钥路径。 <./cert.key>" : "Set your pem certificate key file path <./cert.key>",
+                CommandOptionType.SingleOrNoValue);
             var listen = new IPEndPoint(IPAddress.Any, 80);
             var modelPath = Environment.GetEnvironmentVariable("OLLAMA_MODELS") ??
                             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ollama",
@@ -57,6 +66,10 @@ namespace Onllama.MyRegistry
                                 {
                                     //listenOptions.UseHttps();
                                     listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                                    if (httpsOption.HasValue()) listenOptions.UseHttps();
+                                    if (pemOption.HasValue() && keyOption.HasValue())
+                                        listenOptions.UseHttps(X509Certificate2.CreateFromPem(
+                                            File.ReadAllText(pemOption.Value()), File.ReadAllText(keyOption.Value())));
                                 });
                         })
 
