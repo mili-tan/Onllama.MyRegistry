@@ -49,6 +49,7 @@ namespace Onllama.MyRegistry
 
             cmd.OnExecute(() =>
             {
+                if (httpsOption.HasValue()) listen.Port = 443;
                 if (ipOption.HasValue()) listen = IPEndPoint.Parse(ipOption.Value());
                 if (modelPathOption.HasValue()) modelPath = modelPathOption.Value();
                 Console.WriteLine("ModelPath:" + modelPath);
