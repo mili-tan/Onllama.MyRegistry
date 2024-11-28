@@ -65,7 +65,6 @@ namespace Onllama.MyRegistry
                             options.Listen(listen,
                                 listenOptions =>
                                 {
-                                    //listenOptions.UseHttps();
                                     listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                                     if (httpsOption.HasValue()) listenOptions.UseHttps();
                                     if (pemOption.HasValue() && keyOption.HasValue())

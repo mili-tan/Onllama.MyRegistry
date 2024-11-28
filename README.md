@@ -29,10 +29,13 @@ Options:
   -?|-he|--help             Show help information / 查看帮助信息。
   -l|--listen <IPEndPoint>  Set server listening address and port / 监听的地址与端口。
   -m|--model <path>         Set model path / 模型文件路径。
+  -s|--https                   Set enable HTTPS / 启用 HTTPS。
+  -pem|--pemfile[:<FilePath>]  Set your pem certificate file path <./cert.pem> / PEM 证书路径。 <./cert.pem>
+  -key|--keyfile[:<FilePath>]  Set your pem certificate key file path <./cert.key> / PEM 证书密钥路径。 <./cert.key>
 ```
 ## TODO
 - [x] CLI
-- [ ] HTTPS
+- [x] HTTPS
 - [ ] Ollama Push
 - [ ] Identity / Ollama Keys
 - [ ] Fallback to reverse proxy
