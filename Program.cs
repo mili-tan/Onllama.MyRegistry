@@ -16,6 +16,7 @@ namespace Onllama.MyRegistry
         static void Main(string[] args)
         {
             var isZh = Thread.CurrentThread.CurrentCulture.Name.Contains("zh");
+            var host = string.Empty;
             var cmd = new CommandLineApplication
             {
                 Name = "Onllama.MyRegistry",
@@ -31,7 +32,7 @@ namespace Onllama.MyRegistry
             var modelPathOption = cmd.Option<string>("-m|--model <path>",
                 isZh ? "模型文件路径。" : "Set model path",
                 CommandOptionType.SingleValue);
-            var httpsOption = cmd.Option("-s|--https", isZh ? "启用 HTTPS。" : "Set enable HTTPS",
+            var httpsOption = cmd.Option("-s|--https", isZh ? "启用 HTTPS。（默认自签名，不推荐）" : "Set enable HTTPS (Self-signed by default, not recommended)",
                 CommandOptionType.NoValue);
             var pemOption = cmd.Option<string>("-pem|--pemfile <FilePath>",
                 isZh ? "PEM 证书路径。 <./cert.pem>" : "Set your pem certificate file path <./cert.pem>",
@@ -39,7 +40,9 @@ namespace Onllama.MyRegistry
             var keyOption = cmd.Option<string>("-key|--keyfile <FilePath>",
                 isZh ? "PEM 证书密钥路径。 <./cert.key>" : "Set your pem certificate key file path <./cert.key>",
                 CommandOptionType.SingleOrNoValue);
-            var listen = new IPEndPoint(IPAddress.Any, 80);
+            var hostOption = cmd.Option<string>("-h|--host <Hostname>",
+                isZh ? "设置允许的主机名。（默认全部允许）" : "Set the allowed host names. (Allow all by default)",
+                CommandOptionType.SingleOrNoValue); var listen = new IPEndPoint(IPAddress.Any, 80);
             var modelPath = Environment.GetEnvironmentVariable("OLLAMA_MODELS") ??
                             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ollama",
             "models");
