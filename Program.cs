@@ -15,8 +15,8 @@ namespace Onllama.MyRegistry
     {
         static void Main(string[] args)
         {
+            var hostname = string.Empty;
             var isZh = Thread.CurrentThread.CurrentCulture.Name.Contains("zh");
-            var host = string.Empty;
             var cmd = new CommandLineApplication
             {
                 Name = "Onllama.MyRegistry",
@@ -55,6 +55,7 @@ namespace Onllama.MyRegistry
                 if (httpsOption.HasValue()) listen.Port = 443;
                 if (ipOption.HasValue()) listen = IPEndPoint.Parse(ipOption.Value());
                 if (modelPathOption.HasValue()) modelPath = modelPathOption.Value();
+                if (hostOption.HasValue()) hostname = hostOption.Value();
                 Console.WriteLine("ModelPath:" + modelPath);
 
                 try
@@ -85,6 +86,20 @@ namespace Onllama.MyRegistry
                                     app.Use(async (context, next) =>
                                     {
                                         Console.WriteLine(context.Request.Path);
+                                        await next.Invoke();
+                                    });
+                                    app.Use(async (context, next) =>
+                                    {
+                                        if (string.IsNullOrWhiteSpace(hostname) &&
+                                            !string.Equals(context.Request.Host.Host, hostname,
+                                                StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            context.Response.StatusCode = 404;
+                                            context.Response.ContentType = "text/plain";
+                                            await context.Response.WriteAsync("404 Host Not Found");
+                                            return;
+                                        }
+
                                         await next.Invoke();
                                     });
 
