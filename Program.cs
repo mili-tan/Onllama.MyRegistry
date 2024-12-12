@@ -90,7 +90,7 @@ namespace Onllama.MyRegistry
                                     });
                                     app.Use(async (context, next) =>
                                     {
-                                        if (string.IsNullOrWhiteSpace(hostname) &&
+                                        if (!string.IsNullOrWhiteSpace(hostname) &&
                                             !string.Equals(context.Request.Host.Host, hostname,
                                                 StringComparison.CurrentCultureIgnoreCase))
                                         {
