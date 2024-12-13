@@ -17,6 +17,7 @@ namespace Onllama.MyRegistry
         {
             var hostname = string.Empty;
             var isZh = Thread.CurrentThread.CurrentCulture.Name.Contains("zh");
+            var allowUA = new List<string> {"ollama", "go-http-client"};
             var cmd = new CommandLineApplication
             {
                 Name = "Onllama.MyRegistry",
@@ -33,6 +34,8 @@ namespace Onllama.MyRegistry
                 isZh ? "模型文件路径。" : "Set model path",
                 CommandOptionType.SingleValue);
             var httpsOption = cmd.Option("-s|--https", isZh ? "启用 HTTPS。（默认自签名，不推荐）" : "Set enable HTTPS (Self-signed by default, not recommended)",
+                CommandOptionType.NoValue);
+            var uaOption = cmd.Option("-u", isZh ? "限制客户端 UA" : "Limit client User-Agent",
                 CommandOptionType.NoValue);
             var pemOption = cmd.Option<string>("-pem|--pemfile <FilePath>",
                 isZh ? "PEM 证书路径。 <./cert.pem>" : "Set your pem certificate file path <./cert.pem>",
@@ -94,9 +97,18 @@ namespace Onllama.MyRegistry
                                             !string.Equals(context.Request.Host.Host, hostname,
                                                 StringComparison.CurrentCultureIgnoreCase))
                                         {
-                                            context.Response.StatusCode = 404;
+                                            context.Response.StatusCode = 403;
                                             context.Response.ContentType = "text/plain";
-                                            await context.Response.WriteAsync("404 Host Not Found");
+                                            await context.Response.WriteAsync("Host Not Found");
+                                            return;
+                                        }
+
+                                        if (uaOption.HasValue() && !allowUA.Any(x =>
+                                                context.Request.Headers.UserAgent.ToString().ToLower().Contains(x)))
+                                        {
+                                            context.Response.StatusCode = 403;
+                                            context.Response.ContentType = "text/plain";
+                                            await context.Response.WriteAsync("Unsupported Client");
                                             return;
                                         }
 
