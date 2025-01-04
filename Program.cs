@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.IO.Compression;
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using System.Runtime.InteropServices;
 using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace Onllama.MyRegistry
 {
@@ -66,7 +68,18 @@ namespace Onllama.MyRegistry
                     var host = new WebHostBuilder()
                         .UseKestrel()
                         .UseContentRoot(AppDomain.CurrentDomain.SetupInformation.ApplicationBase)
-                        .ConfigureServices(services => { services.AddRouting(); })
+                        .ConfigureServices(services =>
+                        {
+                            services.AddRouting();
+                            services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+                            services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+
+                            services.AddResponseCompression(options =>
+                            {
+                                options.Providers.Add<BrotliCompressionProvider>();
+                                options.Providers.Add<GzipCompressionProvider>();
+                            });
+                        })
                         .ConfigureKestrel(options =>
                         {
                             options.Listen(listen,
