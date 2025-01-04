@@ -37,6 +37,8 @@ namespace Onllama.MyRegistry
                 CommandOptionType.SingleValue);
             var httpsOption = cmd.Option("-s|--https", isZh ? "启用 HTTPS。（默认自签名，不推荐）" : "Set enable HTTPS (Self-signed by default, not recommended)",
                 CommandOptionType.NoValue);
+            var compressionOption = cmd.Option("-c|--compression", isZh ? "启用压缩（gzip）" : "Set enable compression (gzip)",
+                CommandOptionType.NoValue);
             var uaOption = cmd.Option("-u", isZh ? "限制客户端 UA" : "Limit client User-Agent",
                 CommandOptionType.NoValue);
             var pemOption = cmd.Option<string>("-pem|--pemfile <FilePath>",
@@ -71,14 +73,21 @@ namespace Onllama.MyRegistry
                         .ConfigureServices(services =>
                         {
                             services.AddRouting();
-                            services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
-                            services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
-
-                            services.AddResponseCompression(options =>
+                            if (compressionOption.HasValue())
                             {
-                                options.Providers.Add<BrotliCompressionProvider>();
-                                options.Providers.Add<GzipCompressionProvider>();
-                            });
+                                services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+                                services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+
+                                services.AddResponseCompression(options =>
+                                {
+                                    options.Providers.Add<BrotliCompressionProvider>();
+                                    options.Providers.Add<GzipCompressionProvider>();
+                                    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                                    {
+                                        "application/octet-stream"
+                                    });
+                                });
+                            }
                         })
                         .ConfigureKestrel(options =>
                         {
