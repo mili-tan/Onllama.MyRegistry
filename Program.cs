@@ -75,8 +75,8 @@ namespace Onllama.MyRegistry
                             services.AddRouting();
                             if (compressionOption.HasValue())
                             {
-                                services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
-                                services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
+                                services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+                                services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 
                                 services.AddResponseCompression(options =>
                                 {
