@@ -10,6 +10,7 @@ using McMaster.Extensions.CommandLineUtils;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.ResponseCompression;
+using System;
 
 namespace Onllama.MyRegistry
 {
@@ -138,7 +139,7 @@ namespace Onllama.MyRegistry
                                     });
 
                                     endpoint.Map(
-                                        "/v2/{rope}/{model}/blobs/{hash}",
+                                        "/v2/{repo}/{model}/blobs/{hash}",
                                         async context =>
                                         {
                                             Console.WriteLine("Blobs:" + context.Connection.RemoteIpAddress + "|" + string.Join(
@@ -152,6 +153,7 @@ namespace Onllama.MyRegistry
                                                 var fileLength = new FileInfo(path).Length;
                                                 context.Response.Headers.Location = context.Request.Path.ToString();
                                                 context.Response.ContentType = "application/octet-stream";
+                                                context.Response.Headers.AcceptRanges = "bytes";
 
                                                 if (context.Request.Headers.ContainsKey("Range"))
                                                 {
@@ -190,19 +192,19 @@ namespace Onllama.MyRegistry
                                         });
 
                                     endpoint.Map(
-                                        "/v2/{rope}/{model}/manifests/{tag}",
+                                        "/v2/{repo}/{model}/manifests/{tag}",
                                         async context =>
                                         {
                                             Console.WriteLine("Manifests:" + context.Connection.RemoteIpAddress + "|" + string.Join(
                                                 ' ', context.Request.Headers.Select(x => x.Key + ":" + x.Value)));
 
-                                            var rope = context.Request.RouteValues["rope"].ToString();
+                                            var repo = context.Request.RouteValues["repo"].ToString();
                                             var model = context.Request.RouteValues["model"].ToString();
                                             var tag = context.Request.RouteValues["tag"].ToString();
 
                                             foreach (var path in Directory
                                                          .GetDirectories(Path.Combine(modelPath, "manifests")).ToList()
-                                                         .Select(subs => Path.Combine(subs, rope, model, tag)))
+                                                         .Select(subs => Path.Combine(subs, repo, model, tag)))
                                             {
                                                 if (!File.Exists(path)) continue;
                                                 Console.WriteLine("Manifests:" + path);
