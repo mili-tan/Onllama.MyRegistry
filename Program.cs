@@ -175,7 +175,7 @@ namespace Onllama.MyRegistry
                                                     context.Response.Headers.Add("Content-Range",
                                                         $"bytes {start}-{end}/{fileLength}");
 
-                                                    if (context.Request.Method != "HEAD")
+                                                    if (context.Request.Method.ToUpper() != "HEAD")
                                                         await context.Response.SendFileAsync(path, start, length);
                                                 }
                                                 else
@@ -185,7 +185,7 @@ namespace Onllama.MyRegistry
                                                     context.Response.Headers.Add("Content-Disposition",
                                                         $"attachment; filename={hash}");
 
-                                                    if (context.Request.Method != "HEAD")
+                                                    if (context.Request.Method.ToUpper() != "HEAD")
                                                         await context.Response.SendFileAsync(path);
                                                 }
                                             }
@@ -210,7 +210,8 @@ namespace Onllama.MyRegistry
                                             {
                                                 if (!File.Exists(path)) continue;
                                                 Console.WriteLine("Manifests:" + path);
-                                                await context.Response.SendFileAsync(path);
+                                                if (context.Request.Method.ToUpper() != "HEAD")
+                                                    await context.Response.SendFileAsync(path);
                                                 return;
                                             }
 
